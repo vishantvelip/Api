@@ -5,20 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Edit Project</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
-    .container { position: relative; top: 20px; background-color: #515151; width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; }
-    h2 { color: white; font-size: 24px; text-align: center; margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; width: 100%; max-width: 500px; }
-    .form-group label { display: block; color: white; margin-bottom: 5px; }
-    .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-    .form-group textarea { resize: vertical; }
-    .form-group img { max-width: 100px; height: auto; margin-top: 10px; border-radius: 4px; }
-    button[type="submit"] { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    button[type="submit"]:hover { background-color: #0056b3; }
-    .message { color: #fff; background-color: #dc3545; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; max-width: 500px; width: 100%; }
-    .message.success { background-color: #28a745; }
-    a { color: white; text-decoration: none; padding: 10px 20px; background-color: #28a745; border-radius: 4px; margin-top: 20px; display: inline-block; }
-    a:hover { background-color: #218838; }
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #232526, #414345); min-height: 100vh; }
+    .container { background: rgba(255,255,255,0.07); border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); width: 100%; max-width: 500px; margin: 40px auto; padding: 40px 32px 32px 32px; display: flex; flex-direction: column; align-items: center;}
+    h2 { color: #fff; font-size: 2rem; text-align: center; margin-bottom: 32px; letter-spacing: 1px;}
+    .form-group { width: 100%; margin-bottom: 18px; }
+    .form-group label { color: #e0e0e0; font-size: 1.05rem; margin-bottom: 6px; display: block;}
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: none;
+      background: #f3f3f3;
+      font-size: 1rem;
+      margin-top: 3px;
+      box-sizing: border-box;
+      outline: none;
+      transition: box-shadow 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      box-shadow: 0 0 0 2px #007bff33;
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group input[type="file"] {
+      border: 1px solid #ccc;
+      padding: 4px;
+      background: #fff;
+    }
+    .form-group img { max-width: 120px; height: auto; margin-top: 10px; border-radius: 4px; background: #eee;}
+    .message {
+      width: 100%;
+      margin-bottom: 18px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 1rem;
+      background: linear-gradient(90deg, #ff6a6a, #ffb86c);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(220,53,69,0.08);
+      animation: fadeIn 0.7s;
+    }
+    .message.success {
+      background: linear-gradient(90deg, #28a745, #84d9a2);
+    }
+    .actions { width: 100%; display: flex; justify-content: space-between; gap: 10px; margin-top: 12px;}
+    button[type="submit"], .back-btn {
+      background: linear-gradient(90deg, #007bff, #00d2ff);
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.07);
+      margin-top: 14px;
+    }
+    button[type="submit"]:hover, .back-btn:hover {
+      background: linear-gradient(90deg, #0056b3, #0099cc);
+      transform: translateY(-2px) scale(1.03);
+    }
+    .back-btn {
+      background: linear-gradient(90deg,#28a745,#84d9a2);
+      margin-top: 0;
+      font-weight: bold;
+    }
+    .back-btn:hover { background: linear-gradient(90deg,#218838,#43e97b);}
+    @media (max-width: 600px) {
+      .container { padding: 18px 6vw; }
+      .actions { flex-direction: column; gap: 10px;}
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
   </style>
 </head>
 <body>
@@ -50,12 +114,14 @@
             <p>Current image: <img src="/<%= project.projectImg %>" alt="Current project image"></p>
           <% } %>
         </div>
-        <button type="submit">Update Project</button>
+        <div class="actions">
+          <button type="submit">Update Project</button>
+          <a href="/api/view" class="back-btn">View Projects</a>
+        </div>
       </form>
     <% } else { %>
-      <div class="message">Project not found. <a href="/api/view">Return to projects</a></div>
+      <div class="message">Project not found. <a href="/api/view" class="back-btn" style="display:inline-block;">Return to projects</a></div>
     <% } %>
-    <a href="/api/view">View Projects</a>
   </div>
   <script>
     document.querySelector('form')?.addEventListener('submit', (e) => {
