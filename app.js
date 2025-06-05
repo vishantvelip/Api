@@ -1,27 +1,38 @@
-
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const projectRoutes = require("./routes/project");
 const multer = require("multer");
-const cors = require('cors');
+const cors = require("cors");
+require("dotenv").config(); // Load .env file
 
 const port = process.env.PORT || 8000;
 const app = express();
 
-// MongoDB connection
-
-
 // CORS configuration to allow origins from .env
-const corsOrigins = process.env.CORS_ORIGINS === "*" ? "*" : process.env.CORS_ORIGINS.split(",");
+const corsOriginsEnv = process.env.CORS_ORIGINS || "*";
+const corsOrigins = corsOriginsEnv === "*" ? "*" : corsOriginsEnv.split(",");
+if (!process.env.CORS_ORIGINS) {
+  console.warn('Warning: CORS_ORIGINS environment variable not set. Defaulting to "*"');
+}
+app.use(
+  cors({
+    origin: corsOrigins, // Use * or specific origins from .env
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
-
+// MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb+srv://vishantvelip:vishants@vishant.qceexb7.mongodb.net/?retryWrites=true&w=majority&appName=vishant")
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Set up view engine
+// Set up view engine (still needed for other routes like home, edit)
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
