@@ -1,1 +1,129 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects (API View)</title>
+  <style>
+    body { background: linear-gradient(135deg,#232526,#414345); margin: 0; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh;}
+    .container { max-width: 800px; background: rgba(255,255,255,0.07); margin: 40px auto; border-radius: 16px; padding: 32px 24px 24px 24px; }
+    .search-form { margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap;}
+    .search-form input {
+      flex: 1 1 240px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      background: #f3f3f3;
+      outline: none;
+      box-sizing: border-box;
+      transition: box-shadow 0.2s;
+    }
+    .search-form input:focus { box-shadow: 0 0 0 2px #007bff33; background: #fff;}
+    .search-form button {
+      padding: 10px 22px;
+      background: linear-gradient(90deg, #007bff, #00d2ff);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .search-form button:hover { background: linear-gradient(90deg,#0056b3,#0099cc);}
+    .project-list { display: flex; flex-direction: column; gap: 18px;}
+    .project-card {
+      display: flex;
+      gap: 22px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      align-items: center;
+      flex-wrap: wrap;
+      animation: fadeIn 0.5s;
+    }
+    .project-card img {
+      width: 140px; height: 100px; object-fit: cover; border-radius: 6px; background: #eee;
+    }
+    .project-details { flex: 1 1 160px; min-width: 160px;}
+    .project-details h3 { margin: 0 0 6px; color: #232526; font-size: 1.15rem;}
+    .project-details p { margin: 4px 0; color: #444;}
+    .back-btn {
+      background: linear-gradient(90deg, #28a745, #84d9a2);
+      color: #fff; font-weight: bold;
+      padding: 10px 22px;
+      border: none; border-radius: 6px;
+      cursor: pointer; font-size: 1rem;
+      text-decoration: none; margin-bottom: 18px; display: inline-block;
+      transition: background .2s;
+    }
+    .back-btn:hover { background: linear-gradient(90deg,#218838,#43e97b);}
+    .error-message { color: #fff; background: #dc3545; border-radius: 6px; padding: 10px 0; text-align: center;}
+    @media (max-width: 640px) {
+      .container { padding: 16px 4vw;}
+      .project-card { flex-direction: column; align-items: flex-start;}
+      .project-card img { width: 100%; height: 170px;}
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form class="search-form" id="search-form">
+      <input type="text" id="search-input" placeholder="Search by project name or title">
+      <button type="submit">Search</button>
+    </form>
+    <a href="/" class="back-btn">Back to Home</a>
+    <div class="project-list" id="project-list"></div>
+  </div>
+  <script>
+    async function fetchProjects(searchQuery = '') {
+      try {
+        const url = searchQuery 
+          ? `/api/view?search=${encodeURIComponent(searchQuery)}`
+          : '/api/view';
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        const projects = await response.json();
+        const projectList = document.getElementById('project-list');
+        projectList.innerHTML = '';
+        if (projects && projects.length > 0) {
+          projects.forEach(project => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            const img = document.createElement('img');
+            img.src = project.projectImg ? `/${project.projectImg}` : '/uploads/placeholder.jpg';
+            img.alt = project.name || 'No image';
+            img.onerror = () => { img.src = '/uploads/placeholder.jpg'; };
+            card.appendChild(img);
+            const detail = document.createElement('div');
+            detail.className = 'project-details';
+            detail.innerHTML = `
+              <h3>${project.name || 'Untitled'}</h3>
+              <p><strong>Title:</strong> ${project.title || 'No title'}</p>
+              <p><strong>Description:</strong> ${project.description || 'No description'}</p>
+              <p><strong>Created:</strong> ${project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'Unknown'}</p>
+            `;
+            card.appendChild(detail);
+            projectList.appendChild(card);
+          });
+        } else {
+          projectList.innerHTML = '<p class="error-message">No projects found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('project-list').innerHTML = '<p class="error-message">Error loading projects.</p>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => fetchProjects());
+    document.getElementById('search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const searchQuery = document.getElementById('search-input').value;
+      fetchProjects(searchQuery);
+    });
+  </script>
+</body>
+</html>
