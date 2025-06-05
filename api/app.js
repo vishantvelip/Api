@@ -23,13 +23,10 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // CORS configuration
-app.use(
-  cors({
-    origin: corsOrigins, // Use * or specific origins from .env
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+app.use(cors({
+  origin: '*'
+}));
+
 
 // Set up view engine
 app.set("view engine", "ejs");
