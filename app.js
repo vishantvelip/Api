@@ -18,7 +18,7 @@ const app = express();
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb+srv://Vishant:<vishant12345>@vishant.mqodd7u.mongodb.net/?retryWrites=true&w=majority&appName=Vishant)
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
