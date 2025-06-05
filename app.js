@@ -14,13 +14,6 @@ const app = express();
 
 // CORS configuration to allow origins from .env
 const corsOrigins = process.env.CORS_ORIGINS === "*" ? "*" : process.env.CORS_ORIGINS.split(",");
-app.use(
-  cors({
-    origin: corsOrigins, // Use * or specific origins from .env
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
 
 
 mongoose
