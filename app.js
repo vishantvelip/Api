@@ -1,3 +1,4 @@
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -11,9 +12,16 @@ const app = express();
 // MongoDB connection
 
 
-app.use(cors({
-  origin: '*' // Allow requests from Project 1
-}));
+// CORS configuration to allow origins from .env
+const corsOrigins = process.env.CORS_ORIGINS === "*" ? "*" : process.env.CORS_ORIGINS.split(",");
+app.use(
+  cors({
+    origin: corsOrigins, // Use * or specific origins from .env
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 
 mongoose
   .connect(process.env.MONGO_URI || "mongodb+srv://vishantvelip:vishants@vishant.qceexb7.mongodb.net/?retryWrites=true&w=majority&appName=vishant")
