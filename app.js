@@ -12,7 +12,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'http://localhost:3000' // Allow requests from Project 1
+  origin: '*' // Allow requests from Project 1
 }));
 
 mongoose
