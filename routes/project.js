@@ -1,4 +1,3 @@
-
 const { Router } = require("express");
 const Project = require("../models/project");
 const fs = require("fs").promises;
@@ -8,11 +7,9 @@ const mongoose = require("mongoose");
 
 const router = Router();
 
-
-
-router.get("/api-view",(req, res)=>{
-    res.render("api-view")
-})
+router.get("/api-view", (req, res) => {
+  res.render("api-view");
+});
 
 // View all projects with search (return JSON)
 router.get("/view", async (req, res) => {
@@ -27,7 +24,7 @@ router.get("/view", async (req, res) => {
         }
       : {};
     const projects = await Project.find(query);
-    res.json(projects); // Return JSON instead of rendering EJS
+    res.json(projects); // JSON for frontend API usage
   } catch (error) {
     res.status(500).json({ message: "Failed to load projects", error: error.message });
   }
@@ -45,7 +42,7 @@ router.post("/create-project", upload.single("projectImg"), async (req, res) => 
     }
     let projectImg = "";
     if (req.file) {
-      projectImg = `uploads/${req.file.filename}`;
+      projectImg = `uploads/${req.file.filename}`; // lowercase uploads
     }
     const newProject = new Project({
       name,
@@ -97,10 +94,13 @@ router.get("/edit/:id", async (req, res) => {
   }
 });
 
-// Update a project
+// Update a project (AJAX and EJS support)
 router.post("/update-project/:id", upload.single("projectImg"), async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      if (req.accepts("json")) {
+        return res.status(400).json({ message: "Invalid project ID" });
+      }
       const projects = await Project.find();
       return res.status(400).render("view-project", {
         projects,
@@ -111,6 +111,9 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
     const { name, title, description } = req.body;
     const project = await Project.findById(req.params.id);
     if (!project) {
+      if (req.accepts("json")) {
+        return res.status(404).json({ message: "Project not found" });
+      }
       const projects = await Project.find();
       return res.status(404).render("view-project", {
         projects,
@@ -119,6 +122,9 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
       });
     }
     if (!name || !title || !description) {
+      if (req.accepts("json")) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
       return res.status(400).render("edit-project", {
         project,
         message: "All fields are required",
@@ -139,6 +145,9 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
       description,
       projectImg,
     });
+    if (req.accepts("json")) {
+      return res.json({ message: "Project updated successfully" });
+    }
     const projects = await Project.find();
     res.render("view-project", {
       projects,
@@ -146,6 +155,9 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
       searchQuery: "",
     });
   } catch (error) {
+    if (req.accepts("json")) {
+      return res.status(500).json({ message: error.message || "Failed to update project" });
+    }
     const project = await Project.findById(req.params.id);
     if (!project) {
       const projects = await Project.find();
@@ -162,10 +174,13 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
   }
 });
 
-// Delete a project
+// Delete a project (AJAX and EJS support)
 router.post("/delete/:id", async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      if (req.accepts("json")) {
+        return res.status(400).json({ message: "Invalid project ID" });
+      }
       const projects = await Project.find();
       return res.status(400).render("view-project", {
         projects,
@@ -175,6 +190,9 @@ router.post("/delete/:id", async (req, res) => {
     }
     const project = await Project.findById(req.params.id);
     if (!project) {
+      if (req.accepts("json")) {
+        return res.status(404).json({ message: "Project not found" });
+      }
       const projects = await Project.find();
       return res.status(404).render("view-project", {
         projects,
@@ -188,6 +206,9 @@ router.post("/delete/:id", async (req, res) => {
       } catch (err) {}
     }
     await Project.findByIdAndDelete(req.params.id);
+    if (req.accepts("json")) {
+      return res.json({ message: "Project deleted successfully" });
+    }
     const projects = await Project.find();
     res.render("view-project", {
       projects,
@@ -195,6 +216,9 @@ router.post("/delete/:id", async (req, res) => {
       searchQuery: "",
     });
   } catch (error) {
+    if (req.accepts("json")) {
+      return res.status(500).json({ message: "Failed to delete project" });
+    }
     const projects = await Project.find();
     res.status(500).render("view-project", {
       projects,
