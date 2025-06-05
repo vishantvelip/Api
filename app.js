@@ -1,31 +1,24 @@
-require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const projectRoutes = require("./routes/project");
 const multer = require("multer");
 const cors = require('cors');
-const fs = require('fs');
-
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
 const port = process.env.PORT || 8000;
 const app = express();
 
 // MongoDB connection
+
+
+app.use(cors({
+  origin: 'http://localhost:3000' // Allow requests from Project 1
+}));
+
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/evening123")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-// CORS configuration
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
 
 // Set up view engine
 app.set("view engine", "ejs");
