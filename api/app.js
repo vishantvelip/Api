@@ -23,7 +23,6 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // CORS configuration
-const corsOrigins = process.env.CORS_ORIGINS === "*" ? "*" : process.env.CORS_ORIGINS.split(",");
 app.use(
   cors({
     origin: corsOrigins, // Use * or specific origins from .env
