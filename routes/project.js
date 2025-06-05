@@ -1,3 +1,4 @@
+
 const { Router } = require("express");
 const Project = require("../models/project");
 const fs = require("fs").promises;
@@ -7,7 +8,13 @@ const mongoose = require("mongoose");
 
 const router = Router();
 
-// View all projects with search
+
+
+router.get("/api-view",(req, res)=>{
+    res.render("api-view")
+})
+
+// View all projects with search (return JSON)
 router.get("/view", async (req, res) => {
   try {
     const searchQuery = req.query.search || "";
@@ -20,13 +27,9 @@ router.get("/view", async (req, res) => {
         }
       : {};
     const projects = await Project.find(query);
-    res.render("view-project", { projects, message: null, searchQuery });
+    res.json(projects); // Return JSON instead of rendering EJS
   } catch (error) {
-    res.status(500).render("view-project", {
-      projects: [],
-      message: "Failed to load projects",
-      searchQuery: "",
-    });
+    res.status(500).json({ message: "Failed to load projects", error: error.message });
   }
 });
 
@@ -123,7 +126,6 @@ router.post("/update-project/:id", upload.single("projectImg"), async (req, res)
     }
     let projectImg = project.projectImg;
     if (req.file) {
-      // Delete old image if it exists
       if (projectImg) {
         try {
           await fs.unlink(path.join(__dirname, "../public", projectImg));
