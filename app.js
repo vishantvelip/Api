@@ -16,7 +16,7 @@ app.use(cors({
 }));
 
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/evening123")
+  .connect(process.env.MONGO_URI || "mongodb+srv://vishantvelip:<vishantvelip>@vishant.qceexb7.mongodb.net/?retryWrites=true&w=majority&appName=vishant")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
